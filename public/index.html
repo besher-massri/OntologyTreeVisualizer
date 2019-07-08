@@ -1,0 +1,68 @@
+<html>
+
+<head>
+    <title>Ontology Tree Visualizer</title>
+    <!-- local styles file -->
+    <link href="stylesheets/style.css" rel="stylesheet" type="text/css">
+
+    <!-- loading d3 4.0-->
+    <script src="javascripts/d3.v4.min.js"></script>
+
+    <!-- loading bootstrap 4.0 (+ jquery as a dependency)-->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+            integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+            crossorigin="anonymous"></script>
+
+    <!-- file saver -->
+    <script src="javascripts/FileSaver.min.js"></script>
+</head>
+
+<body>
+<h1>Ontology Tree Visualizer</h1>
+
+<div>
+    <div style="display: inline-block; float: left;width: 200px ">
+        <!-- intro information div -->
+        <div class="card" style="height: auto; ">
+            <h5 class="card-header">Intro</h5>
+            <p class="card-text">This is the ontology tree of the inforMEA thesaurus, where parent-child relation is
+                constructed based on the <strong>broader</strong> field of the ontology.</p>
+            <h5 class="card-header">Usage</h5>
+            <p class="card-text">By clicking on a node, its immediate children only will expand/collapse.</p>
+            <p class="card-text">By double clicking a node, all the descendent children will expand/collapse as
+                well.</p>
+            <p class="card-text">Terms have definition with them, which can be retrieved by hovering the mouse over
+                them.</p>
+            <p class="card-text">If you want to download the tree data as a json, <a onclick="downloadTree()" href="#">click
+                here</a>
+            </p>
+        </div>
+        <br><br>
+        <!-- term definition div -->
+        <div class="card" style="display: inline-block; height: auto; float: left; width: 200px">
+            <h5 class="card-header" id="name">Definition</h5>
+            <h6 class="card-header">Topics</h6>
+            <ul id="topics-div" class="list-group list-group-flush"></ul>
+            <h6 class="card-header">Synonyms</h6>
+            <ul id="syn-div" class="list-group list-group-flush"></ul>
+        </div>
+    </div>
+    <!-- tree visualization div -->
+    <div id="svg-div" style="float: left;display: inline-block">
+    </div>
+</div>
+
+</body>
+<!-- the javascript program -->
+<script src="javascripts/d3Tree.js"></script>
+<script src="javascripts/dataPreprocessing.js"></script>
+<script src="javascripts/indexController.js"></script>
+</html>
