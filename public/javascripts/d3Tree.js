@@ -520,6 +520,13 @@ function TreeBuilder(identifier) {
     parentNode.children.push(tree[child]);
   };
   /**
+   * Returns a list of all the ids of the nodes in the tree
+   * @returns {string[]} list of ids of the nodes in the tree
+   */
+  tb.getNodesIds=function(){
+    return Object.keys(tree);
+  };
+  /**
    * Get the tree node with the given id
    * @param nodeId: the id of the node to be retrieved
    * @returns $ObjMap|undefined: the node with the given id, or undefined if none exists

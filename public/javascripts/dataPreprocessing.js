@@ -126,11 +126,10 @@ function parseDefintions(tree, definitions) {
  *
  * @param ontology: the ontology data on which the tree will be built
  * @param definitions: the definitions that will be used as additional information to the terms
- * @returns {TreeBuilder}: tree structure contain the terms and their definitions to be used in d3tree visualization
+ * @returns {TreeBuilder}: instance of TreeBuilder that produces the tree structure with the terms and their definitions to be used in d3tree visualization
  */
 function processData(ontology, definitions) {
   let tree = parseOntology(ontology);
   parseDefintions(tree, definitions);
-  tree = tree.compile();
   return tree;
 }

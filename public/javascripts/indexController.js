@@ -88,17 +88,20 @@ function loadData(callback) {
 //Starting point of the program
 
 let tree = {};
-
+let processedTree = {};
 loadData(function (ontology, definitions) {
   //processing data
   tree = processData(ontology, definitions);
+  //The downloadable ontology will consists of the tree, along with the nodes list
+  processedTree = {'ontologyTree': tree.compile(), 'ontologyList': tree.getNodesIds()};
   //visualizing the tree
-  drawTree(tree);
-  //print the final tree structure
-  console.log(JSON.stringify(tree));
+  drawTree(tree.compile());
 });
 
+/**
+ * Download the ontology data as json file named `ontology`
+ */
 function downloadTree() {
-  var blob = new Blob([JSON.stringify(tree)], {type: "text/plain;charset=utf-8"});
-  saveAs(blob, "processTree.json");
+  var blob = new Blob([JSON.stringify(processedTree)], {type: "text/plain;charset=utf-8"});
+  saveAs(blob, "ontology.json");
 }
