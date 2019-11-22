@@ -70,32 +70,21 @@ function drawTree(data) {
 }
 
 
-/**
- * Method for loading the ontology and definitions datasets
- * Since the loading is done asyncronously, a callback function must be provided
- *
- * @param callback: The callback function to call with the ontology and definitions once loading is finished
- */
-function loadData(callback) {
-  /*loading the ontology terms and definitions list*/
-  d3.json('../data/ontology.json', function (ontology) {
-    d3.csv('../data/definitions.csv', function (definitions) {
-      callback(ontology, definitions);
-    });
-  });
-}
-
 //Starting point of the program
 
 let tree = {};
 let processedTree = {};
-loadData(function (ontology, definitions) {
-  //processing data
-  tree = processData(ontology, definitions);
-  //The downloadable ontology will consists of the tree, along with the nodes list
-  processedTree = {'ontologyTree': tree.compile(), 'ontologyList': tree.getNodesIds()};
-  //visualizing the tree
-  drawTree(tree.compile());
+d3.json('/get-tree', function (ontology) {
+  d3.json('/get-distance-matrix', function (distanceMatrix) {
+    //The downloadable ontology will consists of the tree, along with the nodes list
+    processedTree = {
+      terms: ontology.ontologyList,
+      tree: ontology.ontologyTree,
+      distanceMatrix: distanceMatrix.distanceMatrix
+    };
+    //visualizing the tree
+    drawTree(ontology.ontologyTree);
+  });
 });
 
 /**
