@@ -34,22 +34,18 @@ function nodeOver(d) {
     d3.select('#name').text(info.Term);
     let topicsDiv = d3.select('#topics-div');
     topicsDiv.selectAll('*').remove();
-    for (let i = 1; i <= 4; ++i) {
-      if (info['Topic #' + i] !== "") {
-        topicsDiv.append('li')
-          .text(info['Topic #' + i])
-          .attr('class', 'list-group-item');
-      }
-    }
+    info.topics.forEach(cur=>{
+      topicsDiv.append('li')
+        .text(cur)
+        .attr('class', 'list-group-item');
+    });
     let synonymsDiv = d3.select('#syn-div');
     synonymsDiv.selectAll('*').remove();
-    for (let i = 1; i <= 12; ++i) {
-      if (info['Synonym #' + i] !== "") {
-        synonymsDiv.append('li')
-          .text(info['Synonym #' + i])
-          .attr('class', 'list-group-item');
-      }
-    }
+    info.alternative_names.forEach(cur=>{
+      synonymsDiv.append('li')
+        .text(cur)
+        .attr('class', 'list-group-item');
+    });
   }
 }
 
@@ -78,8 +74,8 @@ d3.json('/get-tree', function (ontology) {
   d3.json('/get-distance-matrix', function (distanceMatrix) {
     //The downloadable ontology will consists of the tree, along with the nodes list
     processedTree = {
-      terms: ontology.ontologyList,
       tree: ontology.ontologyTree,
+      terms: distanceMatrix.nodes,
       distanceMatrix: distanceMatrix.distanceMatrix
     };
     //visualizing the tree
@@ -91,6 +87,7 @@ d3.json('/get-tree', function (ontology) {
  * Download the ontology data as json file named `ontology`
  */
 function downloadTree() {
+  console.log(processedTree);
   var blob = new Blob([JSON.stringify(processedTree)], {type: "text/plain;charset=utf-8"});
   saveAs(blob, "ontology.json");
 }

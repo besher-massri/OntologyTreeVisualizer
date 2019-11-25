@@ -59,27 +59,29 @@ class DataPreprocessing {
    * @returns {{distanceMatrix: *, tree: *}}: the tree structure of the ontology
    */
   parseOntology(data) {
-    let tree = TreeBuilder();
+    let tree = TreeBuilder(d => d.id);
     let distanceMatrix = DistanceMatrix();
     let names = {};
     let self = this;
     data['Description'].forEach(function (term) {
-      let name = term['@about'];
-      if (!name.startsWith('http://www.informea.org/terms')) {
-        throw 'name start with no http' + name;
+      let id = term['@about'];
+      if (!id.startsWith('http://www.informea.org/terms')) {
+        throw 'name start with no http' + id;
       }
-      name = self.getTerm(name);
+
+      let name = self.getTerm(id);
       if (names.hasOwnProperty(name)) {
         return;
         //throw 'repeated name' + name;
       }
       if (!name.startsWith('xl_en') && term.hasOwnProperty('broader') && !names.hasOwnProperty(name)) {
         names[name] = 1;
-        let parent = self.getTerm(term['broader']['@resource']);
+        let parentId = term['broader']['@resource'];
+        let parent = self.getTerm(parentId);
         if (parent === "" || parent === undefined) {
           throw 'Parent name is undefined!';
         }
-        tree.addChild(parent, name);
+        tree.addChild({id: parent, uri: parentId}, {id: name, uri: id});
         distanceMatrix.addEdge(parent, name);
       }
     });
@@ -121,7 +123,27 @@ class DataPreprocessing {
     definitions.forEach(function (definition) {
       let name = self.processName(definition['Term']);
       if (tree.getNode(name)) {
-        tree.getNode(name).data = definition;
+        let node = tree.getNode(name);
+        node.data.topics = [];
+        node.data.alternative_names = [];
+        node.data.definitions = [];
+
+        for (let i = 1; i <= 4; ++i) {
+          if (definition['Topic #' + i] !== "") {
+            node.data.topics.push(definition['Topic #' + i]);
+          }
+        }
+        for (let i = 1; i <= 12; ++i) {
+          if (definition['Synonym #' + i] !== "") {
+            node.data.alternative_names.push(definition['Synonym #' + i]);
+          }
+        }
+        for (let i = 1; i <= 4; ++i) {
+          if (definition['Definition #' + i] !== "") {
+            node.data.definitions.push(definition['Definition #' + i]);
+          }
+        }
+        node.data.Term = name;
         termWithDefinition++;
       }
     });
@@ -142,7 +164,19 @@ class DataPreprocessing {
     let {tree, distanceMatrix} = this.parseOntology(ontology);
     this.parseDefintions(tree, definitions);
     let treeData = {'ontologyTree': tree.compile(), 'ontologyList': tree.getNodesIds()};
-    return {tree: treeData, distanceMatrix: distanceMatrix.compile()};
+    let disData=distanceMatrix.compile();
+    let self=this;
+    disData.nodes.forEach((cur,idx)=>{
+      let node=tree.getNode(cur);
+      disData.nodes[idx]={
+        uri:node.data.uri,
+        name:self.replaceAll(cur,'-',' '),
+        alternative_names:node.data.alternative_names.map(cur=>self.replaceAll(cur,'-',' ')),
+        definitions:node.data.definitions,
+        topics:node.data.topics
+      }
+    });
+    return {tree: treeData, distanceMatrix: disData};
   }
 
   /**

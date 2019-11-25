@@ -51,11 +51,13 @@ function TreeBuilder(identifier) {
       throw 'There is an existing node with the same Id!'
     }
     tree[nodeId] = {
-      'name': nodeId,
       'children': [],
       'parent': undefined,
       'data': node
     };
+    let nodeName=node.name?node.name:node.id;
+    tree[nodeId].id=nodeId;
+    tree[nodeId].name=nodeName;
     ++sz;
     return tree[nodeId];
   };
@@ -70,19 +72,20 @@ function TreeBuilder(identifier) {
    */
   tb.addChild = function (parent, child) {
     let parentId = identifier(parent);
-    let childNode = tb.getNode(child);
+    let childId=identifier(child);
+    let childNode = tb.getNode(childId);
     if (!childNode) {
       childNode = tb.createNode(child);
     }
     if (childNode.parent !== undefined) {
       throw ' node' + childNode.name + ' has a parent!';
     }
-    let parentNode = tb.getNode(parent);
+    let parentNode = tb.getNode(parentId);
     if (!parentNode) {
       parentNode = tb.createNode(parent);
     }
     childNode.parent = parentId;
-    parentNode.children.push(tree[child]);
+    parentNode.children.push(tree[childId]);
   };
   /**
    * Returns a list of all the ids of the nodes in the tree
