@@ -120,6 +120,7 @@ class DataPreprocessing {
   parseDefintions(tree, definitions) {
     let termWithDefinition = 0;
     let self = this;
+    let unique = {};
     definitions.forEach(function (definition) {
       let name = self.processName(definition['Term']);
       if (tree.getNode(name)) {
@@ -127,7 +128,6 @@ class DataPreprocessing {
         node.data.topics = [];
         node.data.alternative_names = [];
         node.data.definitions = [];
-
         for (let i = 1; i <= 4; ++i) {
           if (definition['Topic #' + i] !== "") {
             node.data.topics.push(definition['Topic #' + i]);
@@ -135,7 +135,14 @@ class DataPreprocessing {
         }
         for (let i = 1; i <= 12; ++i) {
           if (definition['Synonym #' + i] !== "") {
-            node.data.alternative_names.push(definition['Synonym #' + i]);
+            let syn = definition['Synonym #' + i];
+            if (syn === name) {
+              continue;
+            }
+            if (!unique.hasOwnProperty(syn)) {
+              unique[syn] = 1;
+              node.data.alternative_names.push(syn);
+            }
           }
         }
         for (let i = 1; i <= 4; ++i) {
@@ -145,6 +152,12 @@ class DataPreprocessing {
         }
         node.data.Term = name;
         termWithDefinition++;
+      }
+    });
+    console.log("Total unique names", Object.keys(unique).length);
+    Object.keys(unique).forEach(key => {
+      if (unique[key].length > 1) {
+        console.log("Term: " + key + "\t\t\t\t\t freq: " + unique[key]);
       }
     });
     console.log('number of matched definition', termWithDefinition, ' out of ', definitions.length);
@@ -164,16 +177,16 @@ class DataPreprocessing {
     let {tree, distanceMatrix} = this.parseOntology(ontology);
     this.parseDefintions(tree, definitions);
     let treeData = {'ontologyTree': tree.compile(), 'ontologyList': tree.getNodesIds()};
-    let disData=distanceMatrix.compile();
-    let self=this;
-    disData.nodes.forEach((cur,idx)=>{
-      let node=tree.getNode(cur);
-      disData.nodes[idx]={
-        uri:node.data.uri,
-        name:self.replaceAll(cur,'-',' '),
-        alternative_names:node.data.alternative_names.map(cur=>self.replaceAll(cur,'-',' ')),
-        definitions:node.data.definitions,
-        topics:node.data.topics
+    let disData = distanceMatrix.compile();
+    let self = this;
+    disData.nodes.forEach((cur, idx) => {
+      let node = tree.getNode(cur);
+      disData.nodes[idx] = {
+        uri: node.data.uri,
+        name: self.replaceAll(cur, '-', ' '),
+        alternative_names: node.data.alternative_names.map(cur => self.replaceAll(cur, '-', ' ')),
+        definitions: node.data.definitions,
+        topics: node.data.topics
       }
     });
     return {tree: treeData, distanceMatrix: disData};
